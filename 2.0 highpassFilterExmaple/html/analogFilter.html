@@ -1,0 +1,195 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Design Analog Filter</title><meta name="generator" content="MATLAB 8.3"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2022-01-11"><meta name="DC.source" content="analogFilter.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h1>Design Analog Filter</h1><!--introduction--><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#2">STEP 1:  Enter filter type and its specifications</a></li><li><a href="#3">STEP 2:  Determine Wa of the low pass filter prototype (<img src="analogFilter_eq03784.png" alt="$W_{LPP(s)}$">)</a></li><li><a href="#4">STEP 3: Determine the order (N) of the low pass filter prototype</a></li><li><a href="#5">STEP 4: Determine the transfer function of the lowpass filter prototype <img src="analogFilter_eq49701.png" alt="$H_{LPP(s)}$"> by using <b>Table 9.1</b></a></li><li><a href="#6">STEP 5: Determine the transfer function of the given fliter by using <b>Table 9.2</b></a></li><li><a href="#7">STEP 6: Plot the transfer function of the given fliter</a></li></ul></div><p>The most common filter responses are the Butterworth, Chebyshev, and Bessel types. Many other types are available, but 90% of all applications can be solved with one of these three. Butterworth ensures a flat response in the passband and an adequate rate of rolloff. A good "all rounder," the Butterworth filter is simple to understand and suitable for applications such as audio processing. The Chebyshev gives a much steeper rolloff, but passband ripple makes it unsuitable for audio systems. It is superior for applications in which the passband includes only one frequency of interest (e.g., the derivation of a sine wave from a square wave, by filtering out the harmonics).</p><h2>STEP 1:  Enter filter type and its specifications<a name="2"></a></h2><pre class="codeinput">filter_type = <span class="string">'HP'</span>;
+W_c = 3e4; <span class="comment">% rad/sec</span>
+W_a = 1e4; <span class="comment">% rad/sec</span>
+Mdb= -26; <span class="comment">% dB</span>
+</pre><h2>STEP 2:  Determine Wa of the low pass filter prototype (<img src="analogFilter_eq03784.png" alt="$W_{LPP(s)}$">)<a name="3"></a></h2><pre class="codeinput"><span class="keyword">switch</span> filter_type
+    <span class="keyword">case</span> <span class="string">'LP'</span> <span class="comment">% Lowpass</span>
+        W_a_p1 = W_a/W_c <span class="comment">% WLPp = Wa/Wc</span>
+    <span class="keyword">case</span> <span class="string">'HP'</span> <span class="comment">% Highpass</span>
+        W_a_p1 = W_c/W_a <span class="comment">% WLPp = Wc/Wa</span>
+    <span class="keyword">case</span> <span class="string">'BP'</span> <span class="comment">% Band pass</span>
+        W_a_p1 = ((W_a_1^2)-(W_u*W_l))/((W_u-W_l)*(W_a_1)) <span class="comment">% WLPp = Wa^2 - Wo^2 / B * Wa</span>
+        W_a_p2 = ((W_a_2^2)-(W_u*W_l))/((W_u-W_l)*(W_a_2)) <span class="comment">% WLPp = Wa^2 - Wo^2 / B * Wa</span>
+    <span class="keyword">case</span> <span class="string">'BS'</span> <span class="comment">% Band stop</span>
+        W_a_p1 = ((W_u-W_l)*(W_a_1))/((W_u*W_l)-(W_a_1^2)) <span class="comment">% WLPp = B * Wa/ Wo^2 - Wa^2</span>
+        W_a_p2 = ((W_u-W_l)*(W_a_2))/((W_u*W_l)-(W_a_2^2)) <span class="comment">% WLPp = B * Wa/ Wo^2 - Wa^2</span>
+<span class="keyword">end</span>
+</pre><pre class="codeoutput">
+W_a_p1 =
+
+     3
+
+</pre><h2>STEP 3: Determine the order (N) of the low pass filter prototype<a name="4"></a></h2><pre class="codeinput"><span class="keyword">switch</span> filter_type
+    <span class="keyword">case</span> {<span class="string">'LP'</span>,<span class="string">'HP'</span>} <span class="comment">% Lowpass &amp; Highpass</span>
+        N = ceil((log10(10^(-(Mdb/10))-1))/(2*log10(W_a_p1)))
+    <span class="keyword">case</span> {<span class="string">'BP'</span>,<span class="string">'BS'</span>} <span class="comment">% Band pass &amp; Band stop</span>
+        <span class="keyword">if</span>(ceil((log10(10^(-(Mdb_1/10))-1))/(2*log10(W_a_p1))) &gt; ceil((log10(10^(-(Mdb_2/10))-1))/(2*log10(W_a_p2))))
+            N = ceil((log10(10^(-(Mdb_1/10))-1))/(2*log10(W_a_p1)))
+        <span class="keyword">else</span>
+            N = ceil((log10(10^(-(Mdb_2/10))-1))/(2*log10(W_a_p2)))
+        <span class="keyword">end</span>
+<span class="keyword">end</span>
+</pre><pre class="codeoutput">
+N =
+
+     3
+
+</pre><h2>STEP 4: Determine the transfer function of the lowpass filter prototype <img src="analogFilter_eq49701.png" alt="$H_{LPP(s)}$"> by using <b>Table 9.1</b><a name="5"></a></h2><pre class="codeinput">s = tf(<span class="string">'s'</span>);
+f = s;
+t = getTransferFunction(N,f)
+</pre><pre class="codeoutput">
+t =
+ 
+            1
+  ---------------------
+  s^3 + 2 s^2 + 2 s + 1
+ 
+Continuous-time transfer function.
+
+</pre><h2>STEP 5: Determine the transfer function of the given fliter by using <b>Table 9.2</b><a name="6"></a></h2><pre class="codeinput"><span class="keyword">switch</span> filter_type
+   <span class="keyword">case</span> <span class="string">'LP'</span> <span class="comment">% Lowpass</span>
+       f = s/W_c;
+   <span class="keyword">case</span> <span class="string">'HP'</span> <span class="comment">% Highpass</span>
+       f = W_c/s;
+   <span class="keyword">case</span> <span class="string">'BP'</span> <span class="comment">% Band pass</span>
+       f = (s^2 + (W_u*W_l)) / ((W_u-W_l)*s);
+   <span class="keyword">case</span> <span class="string">'BS'</span> <span class="comment">% Band stop</span>
+       f = ((W_u-W_l)*s) / (s^2 + (W_u*W_l));
+<span class="keyword">end</span>
+t = getTransferFunction(N,f)
+</pre><pre class="codeoutput">
+t =
+ 
+                     s^6
+  -----------------------------------------
+  s^6 + 60000 s^5 + 1.8e09 s^4 + 2.7e13 s^3
+ 
+Continuous-time transfer function.
+
+</pre><h2>STEP 6: Plot the transfer function of the given fliter<a name="7"></a></h2><pre class="codeinput">plotTransferfunction(t);
+</pre><img vspace="5" hspace="5" src="analogFilter_01.png" alt=""> <img vspace="5" hspace="5" src="analogFilter_02.png" alt=""> <img vspace="5" hspace="5" src="analogFilter_03.png" alt=""> <p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2014a</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% Design Analog Filter
+%% 
+% The most common filter responses are the Butterworth, Chebyshev, and Bessel types. Many other types are available, but 90% of all applications can be solved with one of these three.
+% Butterworth ensures a flat response in the passband and an adequate rate of rolloff. A good "all rounder," the Butterworth filter is simple to understand and suitable for applications such as 
+% audio processing. The Chebyshev gives a much steeper rolloff, but passband ripple makes it unsuitable for audio systems. It is superior for applications in which the passband includes only 
+% one frequency of interest (e.g., the derivation of a sine wave from a square wave, by filtering out the harmonics).
+%% STEP 1:  Enter filter type and its specifications
+filter_type = 'HP';
+W_c = 3e4; % rad/sec
+W_a = 1e4; % rad/sec
+Mdb= -26; % dB
+%% STEP 2:  Determine Wa of the low pass filter prototype ($W_{LPP(s)}$)
+switch filter_type
+    case 'LP' % Lowpass
+        W_a_p1 = W_a/W_c % WLPp = Wa/Wc
+    case 'HP' % Highpass
+        W_a_p1 = W_c/W_a % WLPp = Wc/Wa
+    case 'BP' % Band pass
+        W_a_p1 = ((W_a_1^2)-(W_u*W_l))/((W_u-W_l)*(W_a_1)) % WLPp = Wa^2 - Wo^2 / B * Wa
+        W_a_p2 = ((W_a_2^2)-(W_u*W_l))/((W_u-W_l)*(W_a_2)) % WLPp = Wa^2 - Wo^2 / B * Wa
+    case 'BS' % Band stop
+        W_a_p1 = ((W_u-W_l)*(W_a_1))/((W_u*W_l)-(W_a_1^2)) % WLPp = B * Wa/ Wo^2 - Wa^2
+        W_a_p2 = ((W_u-W_l)*(W_a_2))/((W_u*W_l)-(W_a_2^2)) % WLPp = B * Wa/ Wo^2 - Wa^2
+end
+
+%% STEP 3: Determine the order (N) of the low pass filter prototype
+switch filter_type
+    case {'LP','HP'} % Lowpass & Highpass
+        N = ceil((log10(10^(-(Mdb/10))-1))/(2*log10(W_a_p1)))
+    case {'BP','BS'} % Band pass & Band stop
+        if(ceil((log10(10^(-(Mdb_1/10))-1))/(2*log10(W_a_p1))) > ceil((log10(10^(-(Mdb_2/10))-1))/(2*log10(W_a_p2))))
+            N = ceil((log10(10^(-(Mdb_1/10))-1))/(2*log10(W_a_p1)))
+        else
+            N = ceil((log10(10^(-(Mdb_2/10))-1))/(2*log10(W_a_p2)))
+        end
+end
+%% STEP 4: Determine the transfer function of the lowpass filter prototype $H_{LPP(s)}$ by using *Table 9.1*
+s = tf('s');
+f = s;
+t = getTransferFunction(N,f)
+%% STEP 5: Determine the transfer function of the given fliter by using *Table 9.2*
+switch filter_type
+   case 'LP' % Lowpass
+       f = s/W_c;
+   case 'HP' % Highpass
+       f = W_c/s;
+   case 'BP' % Band pass
+       f = (s^2 + (W_u*W_l)) / ((W_u-W_l)*s);
+   case 'BS' % Band stop
+       f = ((W_u-W_l)*s) / (s^2 + (W_u*W_l));       
+end
+t = getTransferFunction(N,f)
+%% STEP 6: Plot the transfer function of the given fliter
+plotTransferfunction(t);
+##### SOURCE END #####
+--></body></html>
